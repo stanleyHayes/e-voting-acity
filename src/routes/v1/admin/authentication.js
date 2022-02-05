@@ -18,9 +18,9 @@ router.get('/profile', getProfile);
 router.put('/profile', updateProfile);
 router.delete('/profile', deactivateProfile);
 router.put('/profile/verify', verifyAccount);
-router.post('/passwords/reset', resetPassword);
-router.post('/passwords/update', updatePassword);
+router.put('/passwords/reset', resetPassword);
+router.put('/passwords/update', updatePassword);
 router.post('/passwords/forgot ', forgotPassword);
-router.post('/otp/resend ', resendOTP);
+router.post('/otp/resend', resendOTP);
 
 export default router;

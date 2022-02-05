@@ -36,8 +36,8 @@ const app = express();
 app.use(express.json());
 app.use(helmet());
 app.use(cors());
-app.use(expressUserAgent());
-app.use(morgan.dev('dev'));
+app.use(expressUserAgent.express());
+app.use(morgan('dev'));
 
 
 app.use('/api/v1/user/auth', userV1AuthRoutes);
