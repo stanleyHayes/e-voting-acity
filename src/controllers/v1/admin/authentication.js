@@ -61,7 +61,7 @@ export const resendOTP = async (req, res) => {
 }
 
 
-export const verifyOTP = async (req, res) => {
+export const verifyAccount = async (req, res) => {
     try {
         res.status(200).json({message: 'Admin Resend OTP', data: {}});
     }catch (e) {
@@ -69,3 +69,11 @@ export const verifyOTP = async (req, res) => {
     }
 }
 
+
+export const forgotPassword = async (req, res) => {
+    try {
+        res.status(200).json({message: 'Admin Forgot Password', data: {}});
+    }catch (e) {
+        res.status(500).json({message: e.message});
+    }
+}
