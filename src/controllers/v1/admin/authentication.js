@@ -1,5 +1,6 @@
 import Admin from "../../../models/v1/admin.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 export const register = async (req, res) => {
     try {
@@ -27,7 +28,19 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
     try {
-        res.status(200).json({message: 'Admin Login', data: {}});
+        const {email, password} = req.body;
+        if (!email || !password) return res.status(400).json({message: 'Missing required fields'});
+
+        const existingUser = await Admin.findOne({email});
+        if (!existingUser) return res.status(401).json({message: 'Auth Failed'});
+
+        if (!await bcrypt.compare(password, existingUser.password))
+            return res.status(401).json({message: 'Auth Failed'});
+        const token = jwt.sign({_id: existingUser._id.toString()}, process.env.JWT_SECRET, {expiresIn: '30d'}, null);
+        existingUser.devices = existingUser.devices.concat({token, ...req.useragent});
+        await existingUser.save();
+
+        res.status(200).json({message: 'Successfully Logged In', data: existingUser, token});
     } catch (e) {
         res.status(500).json({message: e.message});
     }

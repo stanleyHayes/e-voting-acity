@@ -310,27 +310,21 @@ const userSchema = new Schema({
         type: [{
             token: {
                 type: String,
-                required: true
             },
             ip: {
                 type: String,
-                required: true
             },
             browser: {
                 type: String,
-                required: true
             },
             isMobile: {
                 type: String,
-                required: true
             },
             isDesktop: {
-                type: String,
-                required: true
+                type: String
             },
             os: {
-                type: String,
-                required: true
+                type: String
             }
         }]
     },

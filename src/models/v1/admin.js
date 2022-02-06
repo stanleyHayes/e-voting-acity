@@ -2,6 +2,7 @@ import validator from "validator";
 import bcrypt from "bcryptjs";
 
 import mongoose from "mongoose";
+
 const Schema = mongoose.Schema;
 const model = mongoose.model;
 
@@ -20,9 +21,9 @@ const adminSchema = new Schema({
         type: String,
         required: true,
         unique: true,
-        validate(value){
-            if(!validator.isEmail(value)){
-                throw new  Error(`Invalid email: ${value}`);
+        validate(value) {
+            if (!validator.isEmail(value)) {
+                throw new Error(`Invalid email: ${value}`);
             }
         },
         lowercase: true,
@@ -33,9 +34,9 @@ const adminSchema = new Schema({
         trim: true,
         required: true,
         unique: true,
-        validate(value){
-            if(!validator.isMobilePhone(value)){
-                throw new  Error(`Invalid phone: ${value}`);
+        validate(value) {
+            if (!validator.isMobilePhone(value)) {
+                throw new Error(`Invalid phone: ${value}`);
             }
         },
     },
@@ -46,9 +47,9 @@ const adminSchema = new Schema({
         type: String,
         trim: true,
         required: true,
-        validate(value){
-            if(!validator.isStrongPassword(value)){
-                throw new  Error(`Enter a strong password`);
+        validate(value) {
+            if (!validator.isStrongPassword(value)) {
+                throw new Error(`Enter a strong password`);
             }
         },
     },
@@ -239,13 +240,27 @@ const adminSchema = new Schema({
         enum: ['male', 'female'],
         required: true
     },
+    devices: {
+        type: [{
+            token: {type: String,},
+            geoIp: {type: Object,},
+            platform: {type: String,},
+            browser: {type: String,},
+            isMobile: {type: Boolean,},
+            isDesktop: {type: Boolean},
+            os: {type: String},
+            isWindows: {type: Boolean},
+            isLinux: {type: Boolean},
+            isMac: {type: Boolean},
+        }]
+    },
 }, {timestamps: {createdAt: true, updatedAt: true}});
 
-adminSchema.virtual('fullName').get(function (){
+adminSchema.virtual('fullName').get(function () {
     return `${this.firstName} ${this.lastName}`;
 });
 
-adminSchema.virtual('initials').get(function (){
+adminSchema.virtual('initials').get(function () {
     return `${this.firstName[0]}${this.lastName[0]}`;
 });
 

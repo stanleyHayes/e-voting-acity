@@ -5,7 +5,14 @@ const model = mongoose.model;
 const departmentSchema = new Schema({
     name: {
         type: String,
-        required: true
+        required: true,
+        unique: true,
+        lowercase: true,
+    },
+    status: {
+        type: String,
+        enum: ['deleted', 'active'],
+        default: 'active'
     }
 }, {timestamps: {createdAt: true, updatedAt: true}});
 
