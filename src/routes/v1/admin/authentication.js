@@ -8,11 +8,13 @@ import {
     updatePassword,
     updateProfile,
     verifyAccount,
-    forgotPassword
+    forgotPassword,
+    register
 } from "../../../controllers/v1/admin/authentication.js";
 
 const router = Router({mergeParams: true});
 
+router.post('/register', register);
 router.post('/login', login);
 router.get('/profile', getProfile);
 router.put('/profile', updateProfile);

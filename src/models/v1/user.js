@@ -1,5 +1,9 @@
-import {Schema, model} from "mongoose";
-import validator from "validator/es";
+import validator from "validator";
+import bcrypt from "bcryptjs";
+
+import mongoose from "mongoose";
+const Schema = mongoose.Schema;
+const model = mongoose.model;
 
 const userSchema = new Schema({
     firstName: {
@@ -20,52 +24,58 @@ const userSchema = new Schema({
         type: String,
         required: true,
         unique: true,
-        validate(value){
-            if(!validator.isEmail(value)){
-                throw new  Error(`Invalid email: ${value}`);
+        validate(value) {
+            if (!validator.isEmail(value)) {
+                throw new Error(`Invalid email: ${value}`);
             }
         },
         lowercase: true,
         trim: true
     },
-    phone: {
+    phoneNumber: {
         type: String,
         trim: true,
         required: true,
         unique: true,
-        validate(value){
-            if(!validator.isMobilePhone(value)){
-                throw new  Error(`Invalid phone: ${value}`);
+        validate(value) {
+            if (!validator.isMobilePhone(value)) {
+                throw new Error(`Invalid phone: ${value}`);
             }
         },
     },
     image: {
-        type: String,
-        required: true
+        type: String
     },
     rollNumber: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        unique: true
     },
     password: {
         type: String,
         trim: true,
         required: true,
-        validate(value){
-            if(!validator.isStrongPassword(value)){
-                throw new  Error(`Enter a strong password`);
+        validate(value) {
+            if (!validator.isStrongPassword(value)) {
+                throw new Error(`Enter a strong password`);
             }
         },
     },
     authInfo: {
         token: {
             type: String,
-            trim: true
+            trim: true,
+            required: true
         },
         otp: {
             type: String,
-            trim: true
+            trim: true,
+            required: true
+        },
+        expiresAt: {
+            type: Date,
+            required: true
         }
     },
     settings: {
@@ -86,7 +96,156 @@ const userSchema = new Schema({
             default: false
         }
     },
-    permissions: {},
+    permissions: {
+        election: {
+            create: {
+                type: Boolean,
+                default: false
+            },
+            read: {
+                type: Boolean,
+                default: true
+            },
+            update: {
+                type: Boolean,
+                default: false
+            },
+            delete: {
+                type: Boolean,
+                required: false
+            }
+        },
+        candidate: {
+            create: {
+                type: Boolean,
+                default: false
+            },
+            read: {
+                type: Boolean,
+                default: true
+            },
+            update: {
+                type: Boolean,
+                default: false
+            },
+            delete: {
+                type: Boolean,
+                default: false
+            }
+        },
+        electionResult: {
+            create: {
+                type: Boolean,
+                default: false
+            },
+            read: {
+                type: Boolean,
+                default: true
+            },
+            update: {
+                type: Boolean,
+                default: false
+            },
+            delete: {
+                type: Boolean,
+                default: false
+            },
+            beforeElectionEnd: {
+                type: Boolean,
+                default: false
+            }
+        },
+        vote: {
+            create: {
+                type: Boolean,
+                default: true
+            },
+            read: {
+                type: Boolean,
+                default: true
+            },
+            update: {
+                type: Boolean,
+                required: false
+            },
+            delete: {
+                type: Boolean,
+                required: false
+            },
+        },
+        admin: {
+            create: {
+                type: Boolean,
+                default: false
+            },
+            read: {
+                type: Boolean,
+                default: false
+            },
+            update: {
+                type: Boolean,
+                default: false
+            },
+            delete: {
+                type: Boolean,
+                default: false
+            },
+        },
+        user: {
+            create: {
+                type: Boolean,
+                default: false
+            },
+            read: {
+                type: Boolean,
+                default: true
+            },
+            update: {
+                type: Boolean,
+                default: false
+            },
+            delete: {
+                type: Boolean,
+                default: false
+            },
+        },
+        department: {
+            create: {
+                type: Boolean,
+                default: false
+            },
+            read: {
+                type: Boolean,
+                default: true
+            },
+            update: {
+                type: Boolean,
+                default: false
+            },
+            delete: {
+                type: Boolean,
+                default: false
+            },
+        },
+        course: {
+            create: {
+                type: Boolean,
+                default: false
+            },
+            read: {
+                type: Boolean,
+                default: true
+            },
+            update: {
+                type: Boolean,
+                default: false
+            },
+            delete: {
+                type: Boolean,
+                default: false
+            },
+        }
+    },
     nationality: {
         type: String,
         required: true
@@ -94,12 +253,12 @@ const userSchema = new Schema({
     birthdate: {
         type: Date,
         required: true,
-        min: Date.now()
+        max: Date.now()
     },
     interest: {
         type: [String]
     },
-    social: {
+    socialMediaAccounts: {
         twitter: {
             type: String,
             trim: true
@@ -139,7 +298,7 @@ const userSchema = new Schema({
         enum: ['male', 'female'],
         required: true
     },
-    admissionYear: {
+    level: {
         type: String,
         enum: ['freshmen', 'junior', 'sophomore', 'senior'],
         required: true
@@ -153,11 +312,26 @@ const userSchema = new Schema({
                 type: String,
                 required: true
             },
-            ip: {},
-            browser: {},
-            isMobile: {},
-            isDesktop: {},
-            os: {}
+            ip: {
+                type: String,
+                required: true
+            },
+            browser: {
+                type: String,
+                required: true
+            },
+            isMobile: {
+                type: String,
+                required: true
+            },
+            isDesktop: {
+                type: String,
+                required: true
+            },
+            os: {
+                type: String,
+                required: true
+            }
         }]
     },
     department: {
@@ -169,8 +343,23 @@ const userSchema = new Schema({
         type: Schema.Types.ObjectId,
         required: true,
         ref: 'Course'
+    },
+    currentPosition: {
+        type: String
     }
 }, {timestamps: {createdAt: true, updatedAt: true}});
+
+
+userSchema.virtual('fullName').get(function (){
+    if(this.middleName)
+        return `${this.firstName} ${this.middleName} ${this.lastName}`;
+    return `${this.firstName} ${this.lastName}`;
+});
+
+userSchema.virtual('initials').get(function (){
+    return `${this.firstName[0]}${this.lastName[0]}`;
+});
+
 
 const User = model('User', userSchema);
 

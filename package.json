@@ -16,6 +16,8 @@
     "nodemon": "^2.0.15"
   },
   "dependencies": {
+    "@sendgrid/mail": "^7.6.0",
+    "axios": "^0.25.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
@@ -23,8 +25,11 @@
     "express-useragent": "^1.0.15",
     "helmet": "^5.0.2",
     "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.1",
     "mongoose": "^6.2.0",
     "morgan": "^1.10.0",
+    "otp-generator": "^4.0.0",
+    "twilio": "^3.73.1",
     "validator": "^13.7.0"
   }
 }

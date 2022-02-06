@@ -1,5 +1,9 @@
-import {Schema, model} from "mongoose";
-import validator from "validator/es";
+import validator from "validator";
+import bcrypt from "bcryptjs";
+
+import mongoose from "mongoose";
+const Schema = mongoose.Schema;
+const model = mongoose.model;
 
 const adminSchema = new Schema({
     firstName: {
@@ -24,7 +28,7 @@ const adminSchema = new Schema({
         lowercase: true,
         trim: true
     },
-    phone: {
+    phoneNumber: {
         type: String,
         trim: true,
         required: true,
@@ -36,8 +40,7 @@ const adminSchema = new Schema({
         },
     },
     image: {
-        type: String,
-        required: true
+        type: String
     },
     password: {
         type: String,
@@ -48,16 +51,6 @@ const adminSchema = new Schema({
                 throw new  Error(`Enter a strong password`);
             }
         },
-    },
-    authInfo: {
-        token: {
-            type: String,
-            trim: true
-        },
-        otp: {
-            type: String,
-            trim: true
-        }
     },
     settings: {
         showBirthday: {
@@ -81,149 +74,149 @@ const adminSchema = new Schema({
         election: {
             create: {
                 type: Boolean,
-                required: false
+                default: false
             },
             read: {
                 type: Boolean,
-                required: false
+                default: true
             },
             update: {
                 type: Boolean,
-                required: false
+                default: false
             },
             delete: {
                 type: Boolean,
-                required: false
+                default: false
             }
         },
         candidate: {
             create: {
                 type: Boolean,
-                required: false
+                default: false
             },
             read: {
                 type: Boolean,
-                required: false
+                default: true
             },
             update: {
                 type: Boolean,
-                required: false
+                default: false
             },
             delete: {
                 type: Boolean,
-                required: false
+                default: false
             }
         },
         electionResult: {
             create: {
                 type: Boolean,
-                required: false
+                default: false
             },
             read: {
                 type: Boolean,
-                required: false
+                default: true
             },
             update: {
                 type: Boolean,
-                required: false
+                default: false
             },
             delete: {
                 type: Boolean,
-                required: false
+                default: false
             },
             beforeElectionEnd: {
                 type: Boolean,
-                required: false
+                default: false
             }
         },
         vote: {
             create: {
                 type: Boolean,
-                required: false
+                default: false
             },
             read: {
                 type: Boolean,
-                required: false
+                default: true
             },
             update: {
                 type: Boolean,
-                required: false
+                default: false
             },
             delete: {
                 type: Boolean,
-                required: false
+                default: false
             },
         },
         admin: {
             create: {
                 type: Boolean,
-                required: false
+                default: false
             },
             read: {
                 type: Boolean,
-                required: false
+                default: true
             },
             update: {
                 type: Boolean,
-                required: false
+                default: false
             },
             delete: {
                 type: Boolean,
-                required: false
+                default: false
             },
         },
         user: {
             create: {
                 type: Boolean,
-                required: false
+                default: false
             },
             read: {
                 type: Boolean,
-                required: false
+                default: true
             },
             update: {
                 type: Boolean,
-                required: false
+                default: false
             },
             delete: {
                 type: Boolean,
-                required: false
+                default: false
             },
         },
         department: {
             create: {
                 type: Boolean,
-                required: false
+                default: false
             },
             read: {
                 type: Boolean,
-                required: true
+                default: true
             },
             update: {
                 type: Boolean,
-                required: false
+                default: false
             },
             delete: {
                 type: Boolean,
-                required: false
+                default: false
             },
         },
         course: {
             create: {
                 type: Boolean,
-                required: false
+                default: false
             },
             read: {
                 type: Boolean,
-                required: true
+                default: true
             },
             update: {
                 type: Boolean,
-                required: false
+                default: false
             },
             delete: {
                 type: Boolean,
-                required: false
+                default: false
             },
         }
     },
@@ -234,12 +227,12 @@ const adminSchema = new Schema({
     birthdate: {
         type: Date,
         required: true,
-        min: Date.now()
+        max: Date.now()
     },
     status: {
         type: String,
         enum: ['pending', 'verified', 'active', 'suspended'],
-        default: 'pending'
+        default: 'verified'
     },
     gender: {
         type: String,
@@ -247,6 +240,14 @@ const adminSchema = new Schema({
         required: true
     },
 }, {timestamps: {createdAt: true, updatedAt: true}});
+
+adminSchema.virtual('fullName').get(function (){
+    return `${this.firstName} ${this.lastName}`;
+});
+
+adminSchema.virtual('initials').get(function (){
+    return `${this.firstName[0]}${this.lastName[0]}`;
+});
 
 const Admin = model('Admin', adminSchema);
 

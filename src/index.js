@@ -21,13 +21,13 @@ import adminV1ElectionRoutes from "./routes/v1/admin/elections.js";
 
 
 // User V1 Routes
-import userV1AuthRoutes from "./routes/v1/admin/authentication.js";
-import userV1CandidateRoutes from "./routes/v1/admin/candidates.js";
-import userV1CourseRoutes from "./routes/v1/admin/courses.js";
-import userV1DepartmentRoutes from "./routes/v1/admin/departments.js";
-import userV1ElectionResultRoutes from "./routes/v1/admin/election-results.js";
-import userV1VoteRoutes from "./routes/v1/admin/votes.js";
-import userV1ElectionRoutes from "./routes/v1/admin/votes.js";
+import userV1AuthRoutes from "./routes/v1/user/authentication.js";
+import userV1CandidateRoutes from "./routes/v1/user/candidates.js";
+import userV1CourseRoutes from "./routes/v1/user/courses.js";
+import userV1DepartmentRoutes from "./routes/v1/user/departments.js";
+import userV1ElectionResultRoutes from "./routes/v1/user/election-results.js";
+import userV1VoteRoutes from "./routes/v1/user/votes.js";
+import userV1ElectionRoutes from "./routes/v1/user/votes.js";
 
 
 dotenv.config();

@@ -1,4 +1,6 @@
-import {Schema, model} from "mongoose";
+import mongoose from "mongoose";
+const Schema = mongoose.Schema;
+const model = mongoose.model;
 
 const courseSchema = new Schema({
     name: {
