@@ -1,5 +1,6 @@
 export const castVote = async (req, res) => {
     try {
+
         res.status(201).json({data: {},  message: 'Vote Casted Successfully'});
     }catch (e) {
         res.status(500).json({message: e.message});

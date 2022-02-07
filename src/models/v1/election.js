@@ -65,7 +65,7 @@ const electionSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'published', 'upcoming', 'ongoing', 'ended'],
+        enum: ['pending', 'published'],
         default: 'pending'
     }
 }, {timestamps: {createdAt: true, updatedAt: true}});
@@ -77,6 +77,12 @@ electionSchema.virtual('candidateCount', {
     foreignField: 'election'
 });
 
+
+electionSchema.virtual('candidates', {
+    localField: '_id',
+    justOne: false,
+    foreignField: 'election'
+});
 
 const Election = model('Election', electionSchema);
 
