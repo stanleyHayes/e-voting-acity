@@ -1,5 +1,4 @@
 import validator from "validator";
-import bcrypt from "bcryptjs";
 
 import mongoose from "mongoose";
 
@@ -219,6 +218,28 @@ const adminSchema = new Schema({
                 type: Boolean,
                 default: false
             },
+        },
+        invitation: {
+            create: {
+                type: Boolean,
+                default: false
+            },
+            read: {
+                type: Boolean,
+                default: true
+            },
+            update: {
+                type: Boolean,
+                default: false
+            },
+            delete: {
+                type: Boolean,
+                default: false
+            },
+            revoke: {
+                type: Boolean,
+                default: false
+            }
         }
     },
     nationality: {

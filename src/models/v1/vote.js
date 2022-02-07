@@ -1,5 +1,5 @@
-import {Schema, model} from "mongoose";
-
+import mongoose from "mongoose";
+const {Schema, model} = mongoose;
 const voteSchema = new Schema({
     user: {
         type: Schema.Types.ObjectId,
