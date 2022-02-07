@@ -35,6 +35,10 @@ const candidateSchema = new Schema({
     },
     achievements: {
         type: [String]
+    },
+    slogan: {
+        type: String,
+        required: true
     }
 }, {timestamps: {createdAt: true, updatedAt: true}});
 

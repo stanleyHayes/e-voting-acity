@@ -1,9 +1,9 @@
 import {Router} from "express";
-import {castVote, getVotes, getVote, revokeVote, updateVote} from "../../../controllers/v1/admin/votes.js";
+import {getVotes, getVote} from "../../../controllers/v1/admin/votes.js";
 
 const router = Router({mergeParams: true});
 
-router.route('/').get(getVotes).post(castVote);
-router.route('/:id').get(getVote).put(updateVote).delete(revokeVote);
+router.route('/').get(getVotes);
+router.route('/:id').get(getVote);
 
 export default router;

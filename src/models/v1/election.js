@@ -1,6 +1,13 @@
-import {Schema, model} from "mongoose";
+import mongoose from "mongoose";
+
+const Schema = mongoose.Schema;
+const model = mongoose.model;
 
 const electionSchema = new Schema({
+    banner: {
+        type: String,
+        required: true,
+    },
     title: {
         type: String,
         required: true,
@@ -19,6 +26,14 @@ const electionSchema = new Schema({
         type: Date,
         required: true,
     },
+    startDateTime: {
+        type: Date,
+        required: true,
+    },
+    endDateTime: {
+        type: Date,
+        required: true,
+    },
     endDate: {
         type: Date,
         required: true,
@@ -29,17 +44,33 @@ const electionSchema = new Schema({
     },
     maximumAllowedCandidates: {
         type: Number,
-        required: true
+        required: true,
+        min: 0
     },
     minimumAllowedCandidates: {
         type: Number,
-        required: true
+        required: true,
+        min: 0
     },
     authorizations: {
         departments: {type: [{type: Schema.Types.ObjectId, ref: 'Department'}]},
+        courses: {type: Schema.Types.ObjectId, ref: 'Course'},
         levels: {type: [String]}
+    },
+    scope: {
+        type: String,
+        enum: ['school', 'department', 'club', 'course'],
+        required: true
     }
 }, {timestamps: {createdAt: true, updatedAt: true}});
+
+
+electionSchema.virtual('candidateCount', {
+    localField: '_id',
+    count: true,
+    foreignField: 'election'
+});
+
 
 const Election = model('Election', electionSchema);
 
