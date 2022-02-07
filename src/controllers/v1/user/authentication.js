@@ -8,6 +8,7 @@ import {SMS_VERIFICATION} from "../../../utils/sms/verification.js";
 import moment from "moment";
 import bcrypt from "bcryptjs";
 
+
 export const register = async (req, res) => {
     try {
         const {
@@ -15,7 +16,7 @@ export const register = async (req, res) => {
             firstName,
             middleName,
             lastName,
-            rollNumber,
+            rollNumberOrStaffID,
             phoneNumber,
             image,
             password,
@@ -26,14 +27,14 @@ export const register = async (req, res) => {
             department,
             course
         } = req.body;
-        if (!firstName && !lastName && !rollNumber && !phoneNumber && !image && !password && !nationality && !birthdate && !gender && !level && !department && !course)
+        if (!firstName && !lastName && !rollNumberOrStaffID && !phoneNumber && !image && !password && !nationality && !birthdate && !gender && !level && !department && !course)
             return res.status(400).json({message: 'Missing required fields'});
         if (!email.endsWith('@acity.edu.gh'))
             return res.status(403).json({message: 'You do not belong to this organization'});
 
-        const existingUser = await User.findOne({$or: [{rollNumber}, email]});
+        const existingUser = await User.findOne({$or: [{rollNumberOrStaffID}, email]});
         if (existingUser)
-            return res.status(409).json({message: `An account exist with ${email} or ${rollNumber}`});
+            return res.status(409).json({message: `An account exist with ${email} or ${rollNumberOrStaffID}`});
 
         const existingDepartment = await Department.findById(department);
         const existingCourse = await Course.findOne({department, course});
@@ -45,7 +46,7 @@ export const register = async (req, res) => {
             firstName,
             middleName,
             lastName,
-            rollNumber,
+            rollNumberOrStaffID,
             phoneNumber,
             image,
             level,
@@ -130,6 +131,7 @@ export const resetPassword = async (req, res) => {
 }
 
 
+
 export const resendOTP = async (req, res) => {
     try {
         res.status(200).json({message: 'Resend OTP', data: {}});
@@ -139,6 +141,7 @@ export const resendOTP = async (req, res) => {
 }
 
 
+
 export const verifyAccount = async (req, res) => {
     try {
         res.status(200).json({message: 'Resend OTP', data: {}});
@@ -146,6 +149,8 @@ export const verifyAccount = async (req, res) => {
         res.status(500).json({message: e.message});
     }
 }
+
+
 
 export const forgotPassword = async (req, res) => {
     try {

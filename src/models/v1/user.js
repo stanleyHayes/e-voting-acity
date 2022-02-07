@@ -45,7 +45,7 @@ const userSchema = new Schema({
     image: {
         type: String
     },
-    rollNumber: {
+    rollNumberOrStaffID: {
         type: String,
         required: true,
         trim: true,
@@ -258,7 +258,7 @@ const userSchema = new Schema({
         required: true,
         max: Date.now()
     },
-    interest: {
+    interests: {
         type: [String]
     },
     socialMediaAccounts: {

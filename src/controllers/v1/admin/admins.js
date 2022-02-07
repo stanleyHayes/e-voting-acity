@@ -68,7 +68,6 @@ export const getAdmins = async (req, res) => {
             .limit(limit)
             .skip(skip)
             .sort({createdAt: -1});
-
         res.status(200).json({data: admins, adminCount: totalAdmins, message: 'Admin Retrieved Successfully'});
     } catch (e) {
         res.status(500).json({message: e.message});

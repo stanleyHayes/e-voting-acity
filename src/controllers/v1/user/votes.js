@@ -9,7 +9,7 @@ export const castVote = async (req, res) => {
 
 export const updateVote = async (req, res) => {
     try {
-        res.status(201).json({data: {},  message: 'Vote Updated Successfully'});
+        res.status(200).json({data: {},  message: 'Vote Updated Successfully'});
     }catch (e) {
         res.status(500).json({message: e.message});
     }
@@ -18,7 +18,7 @@ export const updateVote = async (req, res) => {
 
 export const revokeVote = async (req, res) => {
     try {
-        res.status(201).json({data: {},  message: 'Vote Revoked Successfully'});
+        res.status(200).json({data: {},  message: 'Vote Revoked Successfully'});
     }catch (e) {
         res.status(500).json({message: e.message});
     }
