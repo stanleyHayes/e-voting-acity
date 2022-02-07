@@ -1,5 +1,4 @@
 import validator from "validator";
-import bcrypt from "bcryptjs";
 
 import mongoose from "mongoose";
 const Schema = mongoose.Schema;
@@ -94,6 +93,10 @@ const userSchema = new Schema({
         showLevel: {
             type: Boolean,
             default: false
+        },
+        showRole: {
+            type: Boolean,
+            default: true
         }
     },
     permissions: {
@@ -340,6 +343,11 @@ const userSchema = new Schema({
     },
     currentPosition: {
         type: String
+    },
+    role: {
+        type: String,
+        enum: ['student', 'faculty', 'staff'],
+        required: true
     }
 }, {timestamps: {createdAt: true, updatedAt: true}});
 

@@ -55,12 +55,18 @@ const electionSchema = new Schema({
     authorizations: {
         departments: {type: [{type: Schema.Types.ObjectId, ref: 'Department'}]},
         courses: {type: Schema.Types.ObjectId, ref: 'Course'},
-        levels: {type: [String]}
+        levels: {type: [String]},
+        roles: {type: [String], enum: ['faculty', 'staff', 'student']}
     },
     scope: {
         type: String,
         enum: ['school', 'department', 'club', 'course'],
         required: true
+    },
+    status: {
+        type: String,
+        enum: ['pending', 'published', 'upcoming', 'ongoing', 'ended'],
+        default: 'pending'
     }
 }, {timestamps: {createdAt: true, updatedAt: true}});
 

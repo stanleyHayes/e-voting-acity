@@ -4,13 +4,14 @@ import OTPGenerator from "otp-generator";
 import {INVITATION_EMAIL} from "../../../utils/email/invitation.js";
 import Admin from "../../../models/v1/admin.js";
 import bcrypt from "bcryptjs";
-import invitations from "../../../routes/v1/admin/invitations.js";
 
 export const inviteAdmin = async (req, res) => {
     try {
         const {create} = req.admin.permissions.invitation;
         if (!create) return res.status(401).json({message: 'You do not have permission to perform this operation'});
         const {email} = req.body;
+        const existingAdmin = await Admin.findOne({email});
+        if(existingAdmin)return res.status(409).json({message: 'Email already taken'});
         const existingInvitation = await Invitation.findOne(
             {
                 email, status: {$in: ['pending', 'accepted']}
@@ -138,6 +139,9 @@ export const getInvitations = async (req, res) => {
 export const acceptInvitation = async (req, res) => {
     try {
         const {code, firstName, lastName, phoneNumber, password, email, gender, birthdate, nationality} = req.body;
+
+        const existingAdmin = await Admin.findOne({email});
+        if(existingAdmin)return res.status(409).json({message: 'Email already taken'});
         const existingInvitation = await Invitation.findOne({email, _id: req.params.id, code});
         if (!existingInvitation) return res.status(404).json({message: 'Invitation not found'});
         if (existingInvitation.status === 'revoked')
@@ -149,6 +153,7 @@ export const acceptInvitation = async (req, res) => {
         existingInvitation.status = 'accepted';
         await existingInvitation.save();
         await Admin.create({
+            email,
             gender,
             birthdate,
             nationality,

@@ -64,10 +64,6 @@ const adminSchema = new Schema({
         showPhoneNumber: {
             type: Boolean,
             default: false
-        },
-        showLevel: {
-            type: Boolean,
-            default: false
         }
     },
     permissions: {
