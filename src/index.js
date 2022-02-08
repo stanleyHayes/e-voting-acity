@@ -18,6 +18,7 @@ import adminV1InvitationRoutes from "./routes/v1/admin/invitations.js";
 import adminV1VotesRoutes from "./routes/v1/admin/votes.js";
 import adminV1AdminRoutes from "./routes/v1/admin/admins.js";
 import adminV1ElectionRoutes from "./routes/v1/admin/elections.js";
+import adminV1ElectionRegistrationRoutes from "./routes/v1/admin/election-registrations.js";
 
 
 // User V1 Routes
@@ -28,6 +29,7 @@ import userV1DepartmentRoutes from "./routes/v1/user/departments.js";
 import userV1ElectionResultRoutes from "./routes/v1/user/election-results.js";
 import userV1VoteRoutes from "./routes/v1/user/votes.js";
 import userV1ElectionRoutes from "./routes/v1/user/votes.js";
+import userV1ElectionRegistrationRoutes from "./routes/v1/user/election-registrations.js";
 
 
 dotenv.config();
@@ -47,6 +49,7 @@ app.use('/api/v1/user/departments', userV1DepartmentRoutes);
 app.use('/api/v1/user/election-results', userV1ElectionResultRoutes);
 app.use('/api/v1/user/votes', userV1VoteRoutes);
 app.use('/api/v1/user/elections', userV1ElectionRoutes);
+app.use('/api/v1/user/election-registrations', userV1ElectionRegistrationRoutes);
 
 
 app.use('/api/v1/admin/auth', adminV1AuthRoutes);
@@ -59,6 +62,8 @@ app.use('/api/v1/admin/votes', adminV1VotesRoutes);
 app.use('/api/v1/admin/admins', adminV1AdminRoutes);
 app.use('/api/v1/admin/elections', adminV1ElectionRoutes);
 app.use('/api/v1/admin/invitations', adminV1InvitationRoutes);
+app.use('/api/v1/admin/election-registrations', adminV1ElectionRegistrationRoutes);
+
 
 
 app.listen(process.env.PORT, () => {

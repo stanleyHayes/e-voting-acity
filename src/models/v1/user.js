@@ -247,7 +247,21 @@ const userSchema = new Schema({
                 type: Boolean,
                 default: false
             },
-        }
+        },
+        electionRegistration: {
+            create: {
+                type: Boolean,
+                default: false
+            },
+            read: {
+                type: Boolean,
+                default: true
+            },
+            delete: {
+                type: Boolean,
+                default: false
+            },
+        },
     },
     nationality: {
         type: String,

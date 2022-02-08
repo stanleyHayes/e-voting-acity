@@ -1,6 +1,7 @@
 import Admin from "../../../models/v1/admin.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import User from "../../../models/v1/user.js";
 
 export const register = async (req, res) => {
     try {
@@ -49,7 +50,21 @@ export const login = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
     try {
-        res.status(200).json({message: 'Admin Update Profile', data: {}});
+        const allowedUpdates = ['firstName', 'lastName', 'phoneNumber', 'image', 'settings', 'nationality', 'gender'];
+        const updates = Object.keys(req.body);
+        const isAllowed = updates.every(update => allowedUpdates.includes(update));
+        if(!isAllowed) return res.status(400).json({message: 'Updates not allowed'});
+        for (let key of updates){
+            if(key === 'phoneNumber'){
+                if(req.body['phoneNumber'] !== req.admin.phoneNumber){
+                    const existingUser = await User.findOne({phoneNumber: req.body['phoneNumber']});
+                    if(existingUser) return res.status(400).json({message: 'Phone number already taken'});
+                }
+            }
+            req.admin[key] = req.body[key];
+        }
+        await req.admin.save();
+        res.status(200).json({message: 'Profile Updated Successfully', data: req.admin});
     } catch (e) {
         res.status(500).json({message: e.message});
     }
@@ -58,7 +73,7 @@ export const updateProfile = async (req, res) => {
 
 export const getProfile = async (req, res) => {
     try {
-        res.status(200).json({message: 'Admin Get Profile', data: {}});
+        res.status(200).json({message: 'Profile Retrieved Successfully', data: req.admin, token: req.token});
     } catch (e) {
         res.status(500).json({message: e.message});
     }
@@ -67,7 +82,9 @@ export const getProfile = async (req, res) => {
 
 export const deactivateProfile = async (req, res) => {
     try {
-        res.status(200).json({message: 'Admin Deactivate Password', data: {}});
+        req.admin.status = 'deactivated'
+        await req.admin.save();
+        res.status(200).json({message: 'Profile deactivated successfully'});
     } catch (e) {
         res.status(500).json({message: e.message});
     }

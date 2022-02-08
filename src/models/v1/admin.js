@@ -236,7 +236,17 @@ const adminSchema = new Schema({
                 type: Boolean,
                 default: false
             }
-        }
+        },
+        electionRegistration: {
+            read: {
+                type: Boolean,
+                default: true
+            },
+            delete: {
+                type: Boolean,
+                default: false
+            },
+        },
     },
     nationality: {
         type: String,
@@ -249,7 +259,7 @@ const adminSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'verified', 'active', 'suspended'],
+        enum: ['pending', 'verified', 'active', 'suspended', 'deactivated'],
         default: 'verified'
     },
     gender: {
