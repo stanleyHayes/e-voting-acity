@@ -2,6 +2,11 @@ import Admin from "../../../models/v1/admin.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../../../models/v1/user.js";
+import OTPGenerator from "otp-generator";
+
+import moment from "moment";
+import {FORGOT_PASSWORD} from "../../../utils/email/forgot-password.js";
+import {FORGOT_PASSWORD_SMS} from "../../../utils/sms/forgot-password.js";
 
 export const register = async (req, res) => {
     try {
@@ -53,12 +58,12 @@ export const updateProfile = async (req, res) => {
         const allowedUpdates = ['firstName', 'lastName', 'phoneNumber', 'image', 'settings', 'nationality', 'gender'];
         const updates = Object.keys(req.body);
         const isAllowed = updates.every(update => allowedUpdates.includes(update));
-        if(!isAllowed) return res.status(400).json({message: 'Updates not allowed'});
-        for (let key of updates){
-            if(key === 'phoneNumber'){
-                if(req.body['phoneNumber'] !== req.admin.phoneNumber){
+        if (!isAllowed) return res.status(400).json({message: 'Updates not allowed'});
+        for (let key of updates) {
+            if (key === 'phoneNumber') {
+                if (req.body['phoneNumber'] !== req.admin.phoneNumber) {
                     const existingUser = await User.findOne({phoneNumber: req.body['phoneNumber']});
-                    if(existingUser) return res.status(400).json({message: 'Phone number already taken'});
+                    if (existingUser) return res.status(400).json({message: 'Phone number already taken'});
                 }
             }
             req.admin[key] = req.body[key];
@@ -93,7 +98,12 @@ export const deactivateProfile = async (req, res) => {
 
 export const updatePassword = async (req, res) => {
     try {
-        res.status(200).json({message: 'Admin Update Password', data: {}});
+        const {password, currentPassword} = req.body;
+        if (!await bcrypt.compare(currentPassword, req.admin.password))
+            return res.status(401).json({message: 'Incorrect Password'});
+        req.admin.password = await bcrypt.hash(password, 10);
+        await req.admin.save();
+        res.status(200).json({message: 'Password updated successfully'});
     } catch (e) {
         res.status(500).json({message: e.message});
     }
@@ -102,7 +112,19 @@ export const updatePassword = async (req, res) => {
 
 export const resetPassword = async (req, res) => {
     try {
-        res.status(200).json({message: 'Admin Reset Password', data: {}});
+        const {token, otp, password} = req.body;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET, null, null);
+        const admin = await Admin.findOne({_id: decoded._id, "authInfo.token": token, "authInfo.otp": otp});
+        if(moment().isAfter(admin.authInfo.expiresAt))
+            return res.status(401).json({message: 'OTP expired. Request a new one'});
+        if (!admin) return res.status(404).json({message: 'User not found'});
+        if(admin.authInfo.otp !== otp) return res.status(401).json({message: 'Incorrect OTP'});
+        admin.password = await bcrypt.hash(password, 10);
+        admin.authInfo.otp = undefined;
+        admin.authInfo.token = undefined;
+        admin.authInfo.expiresAt = undefined;
+        await admin.save();
+        res.status(200).json({message: 'Password reset successfully'});
     } catch (e) {
         res.status(500).json({message: e.message});
     }
@@ -120,7 +142,19 @@ export const resendOTP = async (req, res) => {
 
 export const verifyAccount = async (req, res) => {
     try {
-        res.status(200).json({message: 'Admin Resend OTP', data: {}});
+        const {token, otp} = req.body;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET, null, null);
+        const admin = await Admin.findOne({_id: decoded._id, "authInfo.token": token, "authInfo.otp": otp});
+        if(moment().isAfter(admin.authInfo.expiresAt))
+            return res.status(401).json({message: 'OTP expired. Request a new one'});
+        if (!admin) return res.status(404).json({message: 'User not found'});
+        if(admin.authInfo.otp !== otp) return res.status(401).json({message: 'Incorrect OTP'});
+        admin.status = 'verified';
+        admin.authInfo.otp = undefined;
+        admin.authInfo.token = undefined;
+        admin.authInfo.expiresAt = undefined;
+        await admin.save();
+        res.status(200).json({message: 'Account verified successfully'});
     } catch (e) {
         res.status(500).json({message: e.message});
     }
@@ -129,7 +163,33 @@ export const verifyAccount = async (req, res) => {
 
 export const forgotPassword = async (req, res) => {
     try {
-        res.status(200).json({message: 'Admin Forgot Password', data: {}});
+        const {email} = req.body;
+        if (!email) return res.status(400).json({message: 'Missing required fields'});
+        const admin = await Admin.findOne({email});
+        if (!admin) return res.status(403).json({message: 'Auth failed'});
+        const otp = OTPGenerator.generate(6, {
+            digits: true,
+            lowerCaseAlphabets: false,
+            upperCaseAlphabets: false,
+            specialChars: false
+        });
+
+        const token = await jwt.sign(
+            {_id: admin._id},
+            process.env.JWT_SECRET,
+            {expiresIn: '24hrs'},
+            null);
+
+        const link = `https://e-votingacity.vercel.app/auth/verify?token=${token}&otp=${otp}`;
+        const user = {first_name: admin.firstName, last_name: admin.lastName, email};
+        const message = {otp, link, os: req.useragent.os, browser: req.useragent.browser};
+        const text = `Your reset password otp is ${otp}`;
+
+        await FORGOT_PASSWORD.sendForgotPasswordEmail(user, message);
+        await FORGOT_PASSWORD_SMS.sendForgotPasswordSMS(admin.phoneNumber, text);
+        admin.authInfo = {token, otp, expiresAt: moment().add(24, 'hours')};
+        await admin.save();
+        res.status(200).json({message: `Reset link sent to provided email ${email}`});
     } catch (e) {
         res.status(500).json({message: e.message});
     }

@@ -259,7 +259,7 @@ const adminSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'verified', 'active', 'suspended', 'deactivated'],
+        enum: ['pending', 'verified', 'suspended', 'deactivated'],
         default: 'verified'
     },
     gender: {
@@ -281,6 +281,22 @@ const adminSchema = new Schema({
             isMac: {type: Boolean},
         }]
     },
+    authInfo: {
+        token: {
+            type: String,
+            validate(value){
+                if(!validator.isJWT(value)){
+                    throw new Error(`Invalid JWT ${value}`);
+                }
+            }
+        },
+        expiresAt: {
+            type: Date,
+        },
+        otp: {
+            type: String
+        }
+    }
 }, {timestamps: {createdAt: true, updatedAt: true}});
 
 adminSchema.virtual('fullName').get(function () {
