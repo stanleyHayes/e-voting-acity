@@ -24,7 +24,7 @@ const sendForgotPasswordEmail = async (user, message) => {
                         },
                     }
                 ],
-                template_id: process.env.SENDGRID_TEMPLATE_ID
+                template_id: process.env.SENDGRID_FORGOT_PASSWORD_TEMPLATE_ID
             },
             headers: {
                 Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`,

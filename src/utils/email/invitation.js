@@ -6,7 +6,7 @@ dotenv.config({});
 
 const sendInvitationEmail = async (user, message) => {
     try {
-        const response = await axios({
+        axios({
             data: {
                 from: {
                     email: process.env.FROM_EMAIL
